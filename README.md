@@ -5,10 +5,8 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/muhammedalkhudiry/laravel-long-term-tasks/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/muhammedalkhudiry/laravel-long-term-tasks/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/muhammedalkhudiry/laravel-long-term-tasks.svg?style=flat-square)](https://packagist.org/packages/muhammedalkhudiry/laravel-long-term-tasks)
 
-This package handles a common cases where you need to run a long term task in your app such as
-- Reminding users to complete their profile after 7 days of registration
-- When user has multiple payments and whe he/she made the first payment, you want to send him/her a remind for the second payment after 30 days.
-- Delete a user account after 30 days of inactivity
+This package handles a common cases where you need to run a long term task.
+- Example: Delete a user account after 30 days of inactivity
 
 ## Installation
 
@@ -37,6 +35,53 @@ This is the contents of the published config file:
 return [
     'model' => \MuhammedAlkhudiry\LaravelLongTermTasks\Models\LongTermTask::class,
 ];
+```
+
+## Overview
+Let's say you have a client who should have mulitple payments, and we have submit his/her first payment,
+you want to remind him/her to submit the second payment after 30 days.
+
+Typically, you would create a command that checks the database for users who have not submitted the second payment and send them a reminder email
+and run this command in the schedule.
+
+(and the logic here can be more complex, like checking if the user has a valid subscription, or if the user has a valid payment method, etc.)
+
+```php
+// App\Console\Kernel.php
+$schedule->command('second-payment-reminder:send')->everyMinute();
+
+// App\Console\Commands\SecondPaymentReminder.php
+public function handle()
+{
+      Payment::query()
+        ->where('type', PaymentType::FIRST->value)
+        ->where('is_customer_notified', false)
+        ->each(
+          function (Payment $payment) {
+            if ($payment->next_payment_at?->isToday()) {
+              $payment->customer->notify(new SecondPaymentReminderNotification($payment));
+              $payment->update(['is_customer_notified' => true]);
+            }
+          }
+        );
+}
+```
+
+using this package, you can create a task that will be executed after 30 days, and you can handle the logic in the task itself.
+
+```php
+schedule(new \App\Jobs\SecondPaymentReminder())
+    ->on(now()->addDays(30))
+    ->name("second-payment-{$payment->id}")
+    ->save();
+```
+
+And that's it! ✨
+
+Let's say the user refunded the first payment, you can delete the task using the task name.
+
+```php
+\MuhammedAlkhudiry\LaravelLongTermTasks\TaskScheduler::delete("second-payment-{$payment->id}");
 ```
 
 ## Usage
