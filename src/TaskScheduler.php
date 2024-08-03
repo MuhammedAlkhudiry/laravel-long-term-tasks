@@ -102,6 +102,15 @@ class TaskScheduler
         ]);
     }
 
+    public static function get($name)
+    {
+        $taskModel = config('long-term-tasks.model');
+
+        $task = $taskModel::where('name', $name)->firstOrFail();
+
+        return self::getFromModel($task);
+    }
+
     public function update($name)
     {
         $taskModel = config('long-term-tasks.model');
@@ -148,15 +157,16 @@ class TaskScheduler
             }
 
             if ($this->thenCallback) {
-                call_user_func($this->thenCallback);
+                // pass this
+                ($this->thenCallback)($this);
             }
         } catch (Exception $e) {
             if ($this->catchCallback) {
-                call_user_func($this->catchCallback, $e);
+                ($this->catchCallback)($this, $e);
             }
         } finally {
             if ($this->finallyCallback) {
-                call_user_func($this->finallyCallback);
+                ($this->finallyCallback)($this);
             }
         }
     }

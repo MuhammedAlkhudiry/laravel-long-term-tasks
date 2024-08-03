@@ -78,10 +78,7 @@ it('can delete a task', function () {
 
     $this->assertDatabaseCount('long_term_tasks', 2);
 
-    schedule($job)
-        ->on($datetime)
-        ->shouldQueue()
-        ->delete($task->name);
+    TaskScheduler::delete($task->name);
 
     $this->assertDatabaseCount('long_term_tasks', 1);
 });
@@ -138,9 +135,10 @@ it('executes then callback after task runs successfully', function () {
 
     $task = schedule($job)
         ->on($datetime)
-        ->then(function () {
+        ->then(function (TaskScheduler $taskScheduler) {
             // This should be called
             schedule(new ExampleJob)
+                ->name('then-callback')
                 ->on(now()->addDay())
                 ->shouldQueue()
                 ->save();
@@ -151,10 +149,10 @@ it('executes then callback after task runs successfully', function () {
 
     // Check if the then callback was called
     $this->assertDatabaseHas('long_term_tasks', [
-        'name' => $task->name,
+        'name' => 'then-callback',
         'job' => serialize($job),
-        'scheduled_at' => $datetime->format('Y-m-d H:i:s'),
-        'should_queue' => 0,
+        'scheduled_at' => now()->addDay()->format('Y-m-d H:i:s'),
+        'should_queue' => 1,
         'processed_at' => null,
     ]);
 });
@@ -168,7 +166,7 @@ it('executes catch callback after task fails', function () {
         ->then(function () {
             throw new Exception('This is an exception');
         })
-        ->catch(function () {
+        ->catch(function (TaskScheduler $taskScheduler, Exception $exception) {
             // This should be called
             schedule(new ExampleJob)
                 ->on(now()->addDay())
@@ -195,7 +193,7 @@ it('executes finally callback after task runs successfully', function () {
 
     $task = schedule($job)
         ->on($datetime)
-        ->then(function () {
+        ->then(function (TaskScheduler $taskScheduler) {
             // This should be called
             schedule(new ExampleJob)
                 ->on(now()->addDay())
