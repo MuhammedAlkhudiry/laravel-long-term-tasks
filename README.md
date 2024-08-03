@@ -42,7 +42,7 @@ return [
 ## Usage
 ### Create a Task
 ```php
-schedule(new \App\Jobs\SecondPaymentReminder($event))
+schedule(new \App\Jobs\SecondPaymentReminder())
     ->on(now()->addDays(1)) // Required, the date when the task should be executed
     ->name("second-payment-{$payment->id}") // Optional, you can use it later to delete/update the task
     ->then(function ($task) {
