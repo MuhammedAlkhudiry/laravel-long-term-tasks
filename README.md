@@ -5,7 +5,7 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/muhammedalkhudiry/laravel-long-term-tasks/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/muhammedalkhudiry/laravel-long-term-tasks/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/muhammedalkhudiry/laravel-long-term-tasks.svg?style=flat-square)](https://packagist.org/packages/muhammedalkhudiry/laravel-long-term-tasks)
 
-This package handles a common cases where you need to run a long term task.
+This package handles common cases where you must run a long-term task.
 - Example: Delete a user account after 30 days of inactivity
 
 ## Installation
@@ -38,13 +38,13 @@ return [
 ```
 
 ## Overview
-Let's say you have a client who should have mulitple payments, and we have submit his/her first payment,
-you want to remind him/her to submit the second payment after 30 days.
+Let's say you have a client who should have multiple payments, and we have to submit his/her first payment,
+You want to remind him/her to submit the second payment within 30 days.
 
 Typically, you would create a command that checks the database for users who have not submitted the second payment and send them a reminder email
 and run this command in the schedule.
 
-(and the logic here can be more complex, like checking if the user has a valid subscription, or if the user has a valid payment method, etc.)
+(The logic here can be more complex, like checking if the user has a valid subscription, if the user has a valid payment method, etc.)
 
 ```php
 // App\Console\Kernel.php
