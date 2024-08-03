@@ -64,7 +64,8 @@ schedule(new \App\Jobs\SecondPaymentReminder())
     ->save(); // Required, to save the task
 
 ```
-
+[!NOTE]
+- The `then`, `catch`, and `finally` will be serialized.
 ### Delete a Task
 ```php
     \MuhammedAlkhudiry\LaravelLongTermTasks\TaskScheduler::delete("second-payment-{$payment->id}");
