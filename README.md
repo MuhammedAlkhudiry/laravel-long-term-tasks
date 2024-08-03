@@ -40,6 +40,12 @@ return [
 ```
 
 ## Usage
+### Add the command to your schedule
+
+```php
+$schedule->command('long-term-tasks:process')->everyMinute(); // You can change the frequency depending on your needs
+```
+
 ### Create a Task
 ```php
 schedule(new \App\Jobs\SecondPaymentReminder())
