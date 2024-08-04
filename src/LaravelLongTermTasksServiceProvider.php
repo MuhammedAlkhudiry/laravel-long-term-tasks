@@ -18,7 +18,7 @@ class LaravelLongTermTasksServiceProvider extends PackageServiceProvider
         $package
             ->name('laravel-long-term-tasks')
             ->hasConfigFile()
-            ->hasMigration('create_laravel_long_term_tasks_table')
+            ->hasMigration('create_long_term_tasks_table')
             ->hasCommand(ProcessLongTermTasksCommand::class);
     }
 }
